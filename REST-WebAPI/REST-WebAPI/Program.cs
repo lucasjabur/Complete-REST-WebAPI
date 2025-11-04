@@ -1,4 +1,6 @@
 using REST_WebAPI.Configurations;
+using REST_WebAPI.Repositories;
+using REST_WebAPI.Repositories.Implementations;
 using REST_WebAPI.Services;
 using REST_WebAPI.Services.Implementations;
 
@@ -12,6 +14,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddDatabaseConfiguration(builder.Configuration);
 builder.Services.AddScoped<IPersonServices, PersonServicesImpl>();
+builder.Services.AddScoped<IPersonRepository, PersonRepositoryImpl>();
 
 var app = builder.Build();
 
