@@ -1,15 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using REST_WebAPI.Models.Base;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace REST_WebAPI.Models {
 
     [Table("books")]
-    public class Book {
-
-        [Key]
-        [Column("id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
+    public class Book : BaseEntity {
 
         [Column("title")]
         [Required(ErrorMessage = "Title is required!")]

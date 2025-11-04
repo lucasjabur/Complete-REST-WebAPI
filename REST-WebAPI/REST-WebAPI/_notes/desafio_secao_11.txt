@@ -1,0 +1,16 @@
+1° passo:
+- Models -> Person.cs
+Fazer Person.cs implementar BaseEntity.cs e retirar o atributo 'Id' de Person.cs
+
+2° passo:
+- Services -> Implementations -> PersonServicesImpl.cs
+Implementar o repository genérico e retirar a implementação do repository específico
+
+3° passo:
+- Program.cs
+Retirar o serviço da interface e da sua implementação específicos
+Adicionar o repository genérico e a sua implementação genérica
+
+4° passo:
+- Repositories -> IPersonRepository.cs && Repositories -> Implementations -> PersonRepositoryImpl.cs
+Remover estes arquivos, pois não está sendo mais utilizado repository específico

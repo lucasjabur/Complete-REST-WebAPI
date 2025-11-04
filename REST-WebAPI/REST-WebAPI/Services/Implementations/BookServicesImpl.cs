@@ -4,9 +4,10 @@ using REST_WebAPI.Repositories;
 
 namespace REST_WebAPI.Services.Implementations {
     public class BookServicesImpl : IBookServices {
-        private readonly IBookRepository _repository;
 
-        public BookServicesImpl(IBookRepository repository) {
+        private readonly IRepository<Book> _repository;
+
+        public BookServicesImpl(IRepository<Book> repository) {
             _repository = repository;
         }
 

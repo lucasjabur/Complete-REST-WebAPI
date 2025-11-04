@@ -5,9 +5,9 @@ using REST_WebAPI.Repositories.Implementations;
 namespace REST_WebAPI.Services.Implementations {
     public class PersonServicesImpl : IPersonServices {
 
-        private IPersonRepository _repository;
+        private readonly IRepository<Person> _repository;
 
-        public PersonServicesImpl(IPersonRepository repository) {
+        public PersonServicesImpl(IRepository<Person> repository) {
             _repository = repository;
         }
 

@@ -1,15 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using REST_WebAPI.Models.Base;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace REST_WebAPI.Models {
 
     [Table("person")]
-    public class Person {
-
-        [Key]
-        [Column("id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Id { get; set; }
+    public class Person : BaseEntity {
 
         [MaxLength(80)]
         [Column("first_name", TypeName = "varchar(80)")]

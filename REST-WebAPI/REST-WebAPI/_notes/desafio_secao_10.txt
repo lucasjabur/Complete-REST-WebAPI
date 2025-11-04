@@ -1,0 +1,36 @@
+1° passo:
+- Models 
+Criar o modelo a entidade que será mapeada e definir seus atributos
+e método intrínsecos, simples e essenciais à entidade
+
+2° passo:
+- Context -> MSSQLContext.cs
+Organizar o DbSet<> da nova entidade que será mapeada
+
+3° passo:
+- Repositories -> IBookRepository.cs
+Determinar as operações que serão realizadas (CRUD e buscas, por exemplo)
+
+4° passo:
+- Repositories -> Implementations -> BookRepositoryImpl.cs
+Definir atributo de instância do MSSQLContext.cs e fazer injeção de dependência no construtor.
+Implementar a interface e o código dos métodos definidos pela interface
+com o uso do conexto definido anteriormente.
+
+5° passo:
+- Services -> IBookService.cs
+Declarar as operações que serão realizadas (as mesmas do repository)
+
+6° passo:
+- Services -> Implementations -> BookServiceImpl.cs
+Definir atributo por meio da instância da interface do repository para ter acesso às operações
+Fazer injeção de dependência via construtor
+Implementar as funções utilizando o repository instanciado
+
+7° passo: 
+- Program.cs
+Declarar a(s) nova(s) injeção de dependência
+
+8° passo:
+- Controllers -> BookController.cs
+Implementar o controlador (endpoints e rotas) e implementar os logs
