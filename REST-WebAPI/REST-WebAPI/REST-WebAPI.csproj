@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Script\" />
     <Folder Include="Utils\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Evolve" Version="3.4.0-alpha1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0-rc.2.25502.107" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.1-dev-02319" />

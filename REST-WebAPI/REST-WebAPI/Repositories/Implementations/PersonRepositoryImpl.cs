@@ -46,7 +46,6 @@ namespace REST_WebAPI.Repositories.Implementations {
         }
 
         public List<Person> FindAll() {
-
             return _context.People.ToList();
         }
     }
