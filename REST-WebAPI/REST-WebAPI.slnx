@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="REST-WebAPI.Tests/REST-WebAPI.Tests.csproj" Id="61a132ee-804e-45b7-83dc-ab25e557c4eb" />
   <Project Path="REST-WebAPI/REST-WebAPI.csproj" />
 </Solution>

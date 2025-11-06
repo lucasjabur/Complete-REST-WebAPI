@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace REST_WebAPI.Controllers {
+namespace REST_WebAPI.Controllers.V1 {
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/v1")]
     public class TestLogsController : ControllerBase {
 
         private readonly ILogger<TestLogsController> _logger;

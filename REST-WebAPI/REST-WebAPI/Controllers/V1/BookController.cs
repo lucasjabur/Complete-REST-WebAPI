@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using REST_WebAPI.Models;
+using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Services;
 
-namespace REST_WebAPI.Controllers {
+namespace REST_WebAPI.Controllers.V1 {
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/v1")]
     public class BookController : ControllerBase {
 
         private IBookServices _bookServices;
@@ -17,6 +17,9 @@ namespace REST_WebAPI.Controllers {
         }
 
         [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200, Type = typeof(List<BookDTO>))]
         public IActionResult Get() {
 
             _logger.LogInformation("Fetching all books.");
@@ -25,6 +28,9 @@ namespace REST_WebAPI.Controllers {
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200, Type = typeof(BookDTO))]
         public IActionResult Get(long id) {
 
             _logger.LogInformation($"Fetching Book with Id = '{id}'.");
@@ -39,7 +45,10 @@ namespace REST_WebAPI.Controllers {
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Book book) {
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200, Type = typeof(BookDTO))]
+        public IActionResult Create([FromBody] BookDTO book) {
             _logger.LogInformation($"Creating new Book '{book.Title}'.");
             var createdBook = _bookServices.Create(book);
 
@@ -52,7 +61,10 @@ namespace REST_WebAPI.Controllers {
         }
 
         [HttpPut]
-        public IActionResult Update([FromBody] Book book) {
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200, Type = typeof(BookDTO))]
+        public IActionResult Update([FromBody] BookDTO book) {
             _logger.LogInformation($"Updating Book '{book.Title}'.");
             var updatedBook = _bookServices.Update(book);
 
@@ -66,6 +78,9 @@ namespace REST_WebAPI.Controllers {
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(204, Type = typeof(BookDTO))]
         public IActionResult Delete(long id) {
             _logger.LogInformation($"Deleting Book with Id = '{id}'!");
             _bookServices.Delete(id);

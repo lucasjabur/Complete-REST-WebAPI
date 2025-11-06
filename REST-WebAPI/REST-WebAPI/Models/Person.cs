@@ -26,5 +26,10 @@ namespace REST_WebAPI.Models {
         [Column("gender", TypeName = "varchar(6)")]
         [Required(ErrorMessage = "Address is required!")]
         public string Gender { get; set; }
+
+        /*
+            [NotMapped] // desconsidera este campo para construir o banco; ele não será mapeado para o banco
+            public DateTime? BirthDay { get; set; }
+        */
     }
 }

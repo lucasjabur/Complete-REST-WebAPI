@@ -1,34 +1,38 @@
-﻿using REST_WebAPI.Models;
+﻿using Mapster;
+using REST_WebAPI.Data.DTO.V1;
+using REST_WebAPI.Models;
 using REST_WebAPI.Repositories;
-using REST_WebAPI.Repositories.Implementations;
 
 namespace REST_WebAPI.Services.Implementations {
     public class PersonServicesImpl : IPersonServices {
 
-        private readonly IRepository<Person> _repository;
+        private IRepository<Person> _repository;
 
         public PersonServicesImpl(IRepository<Person> repository) {
             _repository = repository;
         }
 
-        public Person Create(Person person) {
-            return _repository.Create(person);
+        public PersonDTO Create(PersonDTO person) {
+            var entity = person.Adapt<Person>();
+            entity = _repository.Create(entity);
+            return entity.Adapt<PersonDTO>();
         }
 
-        public Person Update(Person person) {
-            return _repository.Update(person);
+        public PersonDTO Update(PersonDTO person) {
+            var entity = person.Adapt<Person>();
+            entity = _repository.Update(entity);
+            return entity.Adapt<PersonDTO>();
         }
-
         public void Delete(long id) {
             _repository.Delete(id);
         }
-
-        public Person FindById(long id) {
-            return _repository.FindById(id);
+       
+        public PersonDTO FindById(long id) {
+            return _repository.FindById(id).Adapt<PersonDTO>();
         }
 
-        public List<Person> FindAll() {
-            return _repository.FindAll();
+        public List<PersonDTO> FindAll() {
+            return _repository.FindAll().Adapt<List<PersonDTO>>();
         }
     }
 }

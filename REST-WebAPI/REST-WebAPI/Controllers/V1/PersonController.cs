@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using REST_WebAPI.Models;
+﻿using Microsoft.AspNetCore.Mvc;
+using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Services;
 
-namespace REST_WebAPI.Controllers {
+namespace REST_WebAPI.Controllers.V1 {
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/v1")]
     public class PersonController : ControllerBase {
 
         private IPersonServices _personService;
@@ -18,6 +17,9 @@ namespace REST_WebAPI.Controllers {
         }
 
         [HttpGet]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200, Type = typeof(List<PersonDTO>))]
         public IActionResult Get() {
 
             _logger.LogInformation("Fetching all people.");
@@ -26,6 +28,9 @@ namespace REST_WebAPI.Controllers {
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200, Type = typeof(PersonDTO))]
         public IActionResult Get(long id) {
 
             _logger.LogInformation($"Fetching Person with Id = '{id}'.");
@@ -40,7 +45,10 @@ namespace REST_WebAPI.Controllers {
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Person person) {
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200, Type = typeof(PersonDTO))]
+        public IActionResult Create([FromBody] PersonDTO person) {
 
             _logger.LogInformation($"Creating new Person: '{person.FirstName}'.");
             var createdPerson = _personService.Create(person);
@@ -50,11 +58,17 @@ namespace REST_WebAPI.Controllers {
                 return NotFound();
             }
 
+            Response.Headers.Add("X-API-Deprecated", "true");
+            Response.Headers.Add("X-API-Deprecation-Date", "2026-12-31");
+
             return Ok(createdPerson);
         }
 
         [HttpPut]
-        public IActionResult Update([FromBody] Person person) {
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200, Type = typeof(PersonDTO))]
+        public IActionResult Update([FromBody] PersonDTO person) {
 
             _logger.LogInformation($"Updating Person with Id = '{person.Id}'.");
             var createdPerson = _personService.Update(person);
@@ -69,6 +83,9 @@ namespace REST_WebAPI.Controllers {
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(204, Type = typeof(PersonDTO))]
         public IActionResult Delete(int id) {
 
             _logger.LogInformation($"Deleting Person with Id = '{id}'.");

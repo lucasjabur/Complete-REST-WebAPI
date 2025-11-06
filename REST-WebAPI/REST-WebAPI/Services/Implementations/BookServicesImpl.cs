@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Mapster;
+using Microsoft.EntityFrameworkCore;
+using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Models;
 using REST_WebAPI.Repositories;
 
@@ -11,23 +13,28 @@ namespace REST_WebAPI.Services.Implementations {
             _repository = repository;
         }
 
-        public Book Create(Book book) {
-            return _repository.Create(book);
+        public BookDTO Create(BookDTO book) {
+            var entity = book.Adapt<Book>();
+            entity = _repository.Create(entity);
+            return entity.Adapt<BookDTO>();
         }
-        public Book Update(Book book) {
-            return _repository.Update(book);
+
+        public BookDTO Update(BookDTO book) {
+            var entity = book.Adapt<Book>();
+            entity = _repository.Update(entity);
+            return entity.Adapt<BookDTO>();
         }
 
         public void Delete(long id) {
             _repository.Delete(id);
         }
 
-        public Book FindById(long id) {
-            return _repository.FindById(id);
+        public BookDTO FindById(long id) {
+            return _repository.FindById(id).Adapt<BookDTO>();
         }
 
-        public List<Book> FindAll() {
-            return _repository.FindAll();
+        public List<BookDTO> FindAll() {
+            return _repository.FindAll().Adapt<List<BookDTO>>();
         }
 
     }

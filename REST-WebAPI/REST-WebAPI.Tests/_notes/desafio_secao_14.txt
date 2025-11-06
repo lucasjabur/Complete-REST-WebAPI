@@ -1,0 +1,5 @@
+1° passo:
+Ver o método que se quer testar e nomear o novo teste com clareza sobre a sua funcionalidade
+
+2° passo:
+Implementar o método de teste
