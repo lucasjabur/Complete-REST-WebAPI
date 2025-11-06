@@ -28,13 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
-	<Content Include="..\REST-WebAPI\db\migrations\**\*.sql"
-			 Link="db\migrations\%(RecursiveDir)%(Filename)%(Extension)"
-			 CopyToOutputDirectory="Always" />
+	<Content Include="..\REST-WebAPI\db\migrations\**\*.sql" Link="db\migrations\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="Always" />
 	
-	<Content Include="..\REST-WebAPI\db\dataset\**\*.sql"
-			   Link="db\dataset\%(RecursiveDir)%(Filename)%(Extension)"
-			   CopyToOutputDirectory="Always" />
+	<Content Include="..\REST-WebAPI\db\dataset\**\*.sql" Link="db\dataset\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="Always" />
   </ItemGroup>
 	
   <ItemGroup>
