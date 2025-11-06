@@ -4,7 +4,7 @@ using REST_WebAPI.Data.Converter.Implementations;
 using REST_WebAPI.Data.DTO.V2;
 using REST_WebAPI.Models;
 
-namespace REST_WebAPI.Tests {
+namespace REST_WebAPI.Tests.UnitTests {
     public class PersonConverterTests {
         private readonly PersonConverter _converter;
 
