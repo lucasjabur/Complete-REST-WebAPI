@@ -7,8 +7,7 @@ using System.Net.Http.Json;
 
 namespace REST_WebAPI.Tests.IntegrationTests.CORS {
     [TestCaseOrderer(
-        "REST_WebAPI.Tests.IntegrationTests.Tools.PriorityOrderer",
-        "REST_WebAPI.Tests")]
+        TestConfig.TestCaseOrdererFullName, TestConfig.TestCaseOrdererAssembly)]
     public class PersonCorsIntegrationTests : IClassFixture<SqlServerFixture> {
         private readonly HttpClient _httpClient;
         private static PersonDTO? _person;

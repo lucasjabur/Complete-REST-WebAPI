@@ -34,6 +34,12 @@
 		<Content Include="..\REST-WebAPI\db\dataset\**\*.sql" Link="db\dataset\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="Always">
 		</Content>
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="appsettings.Test.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
 	
   <ItemGroup>
     <Using Include="Xunit" />

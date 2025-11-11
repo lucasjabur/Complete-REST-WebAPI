@@ -7,8 +7,7 @@ using System.Net.Http.Json;
 
 namespace REST_WebAPI.Tests.IntegrationTests.Person.JSON {
     [TestCaseOrderer(
-        "REST_WebAPI.Tests.IntegrationTests.Tools.PriorityOrderer",
-        "REST-WebAPI.Tests")]
+        TestConfig.TestCaseOrdererFullName, TestConfig.TestCaseOrdererAssembly)]
     public class PersonControllerJsonTests : IClassFixture<SqlServerFixture> {
         private readonly HttpClient _httpClient;
         private static PersonDTO? _person;
@@ -240,11 +239,12 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.JSON {
             first.Enabled.Should().BeTrue();
             first.Gender.Should().Be("Male");
 
-            var sixth = list.First(p => p.FirstName == "Ada");
-            sixth.LastName.Should().Be("Lovelace");
-            sixth.Address.Should().Be("London - England");
-            sixth.Enabled.Should().BeTrue();
-            sixth.Gender.Should().Be("Female");
+
+            var third = list.First(p => p.FirstName == "Nelson");
+            third.LastName.Should().Be("Mandela");
+            third.Address.Should().Be("Mvezo - South Africa");
+            third.Enabled.Should().BeTrue();
+            third.Gender.Should().Be("Male");
         }
     }
 }
