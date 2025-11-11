@@ -2,7 +2,7 @@
 
 namespace REST_WebAPI.Configurations {
     public static class OpenAPIConfig {
-        private static readonly string AppName = 
+        private static readonly string AppName =
             "ASP.NET 2026 REST API's from 0 to Azure and GCP with .NET 10, Docker e Kubernetes";
         private static readonly string AppDescription = $"REST API RESTful developed in course {AppName}";
 

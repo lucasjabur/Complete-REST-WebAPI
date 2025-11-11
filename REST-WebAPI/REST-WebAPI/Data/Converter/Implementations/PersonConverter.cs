@@ -24,7 +24,7 @@ namespace REST_WebAPI.Data.Converter.Implementations {
                 LastName = origin.LastName,
                 Address = origin.Address,
                 Gender = origin.Gender,
-                BirthDay = DateTime.Now
+                // BirthDay = DateTime.Now
                 // BirthDay = origin.BirthDay ?? DateTime.Now
             };
         }

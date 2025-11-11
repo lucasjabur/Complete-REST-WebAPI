@@ -1,4 +1,5 @@
 using REST_WebAPI.Configurations;
+using REST_WebAPI.Hypermedia.Filters;
 using REST_WebAPI.Repositories;
 using REST_WebAPI.Repositories.Implementations;
 using REST_WebAPI.Services;
@@ -10,17 +11,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddSerilogLogging();
 
-builder.Services.AddControllers().AddContentNegotiation();
+builder.Services.AddControllers(options => {
+    options.Filters.Add<HypermediaFilter>();
+}).AddContentNegotiation();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenAPIConfig();
 builder.Services.AddSwaggerConfig();
 builder.Services.AddRouteConfig();
 
+builder.Services.AddCorsConfiguration(builder.Configuration);
+builder.Services.AddHATEOASConfiguration();
 builder.Services.AddDatabaseConfiguration(builder.Configuration);
 builder.Services.AddEvolveConfiguration(builder.Configuration, builder.Environment);
 
 builder.Services.AddScoped<IPersonServices, PersonServicesImpl>();
+builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IBookServices, BookServicesImpl>();
 builder.Services.AddScoped<PersonServicesImplV2>();
 
@@ -34,8 +40,11 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+app.UseRouting();
+app.UseCorsConfiguration(builder.Configuration);
 
 app.MapControllers();
+app.UseHATEOASRoutes();
 
 app.UseSwaggerConfiguration();
 app.UseScalarConfiguration();

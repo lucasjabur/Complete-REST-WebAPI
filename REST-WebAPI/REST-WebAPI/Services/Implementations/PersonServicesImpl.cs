@@ -1,15 +1,22 @@
 ﻿using Mapster;
-using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Models;
 using REST_WebAPI.Repositories;
+using REST_WebAPI.Data.DTO.V1;
 
 namespace REST_WebAPI.Services.Implementations {
     public class PersonServicesImpl : IPersonServices {
 
-        private IRepository<Person> _repository;
-
-        public PersonServicesImpl(IRepository<Person> repository) {
+        private IPersonRepository _repository;
+        public PersonServicesImpl(IPersonRepository repository) {
             _repository = repository;
+        }
+
+        public List<PersonDTO> FindAll() {
+            return _repository.FindAll().Adapt<List<PersonDTO>>();
+        }
+
+        public PersonDTO FindById(long id) {
+            return _repository.FindById(id).Adapt<PersonDTO>();
         }
 
         public PersonDTO Create(PersonDTO person) {
@@ -26,13 +33,10 @@ namespace REST_WebAPI.Services.Implementations {
         public void Delete(long id) {
             _repository.Delete(id);
         }
-       
-        public PersonDTO FindById(long id) {
-            return _repository.FindById(id).Adapt<PersonDTO>();
-        }
 
-        public List<PersonDTO> FindAll() {
-            return _repository.FindAll().Adapt<List<PersonDTO>>();
+        public PersonDTO Disable(long id) {
+            var entity = _repository.Disable(id);
+            return entity.Adapt<PersonDTO>();
         }
     }
 }

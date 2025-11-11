@@ -15,7 +15,7 @@ namespace REST_WebAPI.Models {
         [Required(ErrorMessage = "Author is required!")]
         public string Author { get; set; }
 
-        [Column("price")]
+        [Column("price", TypeName = "decimal(18,2)")]
         [Required(ErrorMessage = "Price is required!")]
         public decimal Price { get; set; }
 

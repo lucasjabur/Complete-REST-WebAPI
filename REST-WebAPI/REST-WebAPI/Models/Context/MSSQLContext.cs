@@ -6,6 +6,6 @@ namespace REST_WebAPI.Models.Context {
         public DbSet<Book> Books { get; set; }
 
         public MSSQLContext(DbContextOptions options) : base(options) { }
-        
+
     }
 }

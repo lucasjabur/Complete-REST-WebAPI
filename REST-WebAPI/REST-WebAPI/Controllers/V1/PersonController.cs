@@ -1,97 +1,101 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using REST_WebAPI.Data.DTO.V1;
+using Microsoft.AspNetCore.Mvc;
 using REST_WebAPI.Services;
+using REST_WebAPI.Data.DTO.V1;
 
 namespace REST_WebAPI.Controllers.V1 {
-
     [ApiController]
     [Route("api/[controller]/v1")]
+    // [EnableCors("LocalPolicy")]
     public class PersonController : ControllerBase {
-
         private IPersonServices _personService;
         private readonly ILogger<PersonController> _logger;
 
-        public PersonController(IPersonServices personService, ILogger<PersonController> logger) {
+        public PersonController(IPersonServices personService,
+            ILogger<PersonController> logger) {
             _personService = personService;
             _logger = logger;
         }
 
         [HttpGet]
+        [ProducesResponseType(200, Type = typeof(List<PersonDTO>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(200, Type = typeof(List<PersonDTO>))]
         public IActionResult Get() {
-
-            _logger.LogInformation("Fetching all people.");
-
+            _logger.LogInformation("Fetching all persons");
             return Ok(_personService.FindAll());
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(200, Type = typeof(PersonDTO))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(200, Type = typeof(PersonDTO))]
+        // [EnableCors("LocalPolicy")]
         public IActionResult Get(long id) {
-
-            _logger.LogInformation($"Fetching Person with Id = '{id}'.");
-
+            _logger.LogInformation("Fetching person with ID {id}", id);
             var person = _personService.FindById(id);
             if (person == null) {
-                _logger.LogWarning($"Person with Id = '{id}' was not found!");
+                _logger.LogWarning("Person with ID {id} not found", id);
                 return NotFound();
             }
-
             return Ok(person);
         }
 
         [HttpPost]
+        [ProducesResponseType(200, Type = typeof(PersonDTO))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(200, Type = typeof(PersonDTO))]
-        public IActionResult Create([FromBody] PersonDTO person) {
+        // [EnableCors("MultipleOriginPolicy")]
+        public IActionResult Post([FromBody] PersonDTO person) {
+            _logger.LogInformation("Creating new Person: {firstName}", person.FirstName);
 
-            _logger.LogInformation($"Creating new Person: '{person.FirstName}'.");
             var createdPerson = _personService.Create(person);
-            
             if (createdPerson == null) {
-                _logger.LogWarning($"Failed to create Person with name: '{person.FirstName}'!");
+                _logger.LogError("Failed to create person with name {firstName}", person.FirstName);
                 return NotFound();
             }
-
-            Response.Headers.Add("X-API-Deprecated", "true");
-            Response.Headers.Add("X-API-Deprecation-Date", "2026-12-31");
-
             return Ok(createdPerson);
         }
 
         [HttpPut]
+        [ProducesResponseType(200, Type = typeof(PersonDTO))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(200, Type = typeof(PersonDTO))]
-        public IActionResult Update([FromBody] PersonDTO person) {
+        public IActionResult Put([FromBody] PersonDTO person) {
+            _logger.LogInformation("Updating person with ID {id}", person.Id);
 
-            _logger.LogInformation($"Updating Person with Id = '{person.Id}'.");
             var createdPerson = _personService.Update(person);
-            
             if (createdPerson == null) {
-                _logger.LogWarning($"Failed to update Person with Id: '{person.Id}'.");
+                _logger.LogError("Failed to update person with ID {id}", person.Id);
                 return NotFound();
             }
-
-            _logger.LogDebug($"Person updated successfully: '{person.FirstName}'.");
+            _logger.LogDebug("Person updated successfully: {firstName}", createdPerson.FirstName);
             return Ok(createdPerson);
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(204, Type = typeof(PersonDTO))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(204, Type = typeof(PersonDTO))]
         public IActionResult Delete(int id) {
-
-            _logger.LogInformation($"Deleting Person with Id = '{id}'.");
+            _logger.LogInformation("Deleting person with ID {id}", id);
             _personService.Delete(id);
-            _logger.LogDebug($"Person with Id = '{id}' was deleted successfully.");
+            _logger.LogDebug("Person with ID {id} deleted successfully", id);
             return NoContent();
+        }
+
+        [HttpPatch("{id}")]
+        [ProducesResponseType(200, Type = typeof(PersonDTO))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        public IActionResult Disable(long id) {
+            _logger.LogInformation("Disabling person with ID {id}", id);
+            var disabledPerson = _personService.Disable(id);
+            if (disabledPerson == null) {
+                _logger.LogError("Failed to disable person with ID {id}", id);
+                return NotFound();
+            }
+            _logger.LogDebug("Person with ID {id} disabled successfully", id);
+            return Ok(disabledPerson);
         }
     }
 }

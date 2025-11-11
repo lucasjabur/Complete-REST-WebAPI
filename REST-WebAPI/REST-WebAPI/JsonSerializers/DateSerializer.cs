@@ -16,7 +16,8 @@ namespace REST_WebAPI.JsonSerializers {
         public override void Write(Utf8JsonWriter writer, DateTime? value, JsonSerializerOptions options) {
             if (value.HasValue) {
                 writer.WriteStringValue(value.Value.ToString(_format));
-            } else {
+            }
+            else {
                 writer.WriteNullValue();
             }
         }

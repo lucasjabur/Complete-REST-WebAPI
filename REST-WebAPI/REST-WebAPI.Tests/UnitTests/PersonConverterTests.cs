@@ -4,7 +4,7 @@ using REST_WebAPI.Data.Converter.Implementations;
 using REST_WebAPI.Data.DTO.V2;
 using REST_WebAPI.Models;
 
-namespace REST_WebAPI.Tests {
+namespace REST_WebAPI.Tests.UnitTests {
     public class PersonConverterTests {
         private readonly PersonConverter _converter;
 
@@ -25,7 +25,7 @@ namespace REST_WebAPI.Tests {
                 LastName = "Gandhi",
                 Address = "Porbandar - India",
                 Gender = "Male",
-                BirthDay = new DateTime(1869, 10, 2)
+                //BirthDay = new DateTime(1869, 10, 2)
             };
 
             var expectedPerson = new Person {
@@ -94,8 +94,8 @@ namespace REST_WebAPI.Tests {
             dto.Address.Should().Be(expectedDto.Address);
             dto.Gender.Should().Be(expectedDto.Gender);
 
-            dto.Should().BeEquivalentTo(expectedDto, options => options.Excluding(dto => dto.BirthDay));
-            dto.BirthDay.Should().NotBeNull();
+            //dto.Should().BeEquivalentTo(expectedDto, options => options.Excluding(dto => dto.BirthDay));
+            //dto.BirthDay.Should().NotBeNull();
         }
 
         [Fact]
@@ -114,7 +114,7 @@ namespace REST_WebAPI.Tests {
                     LastName = "Gandhi",
                     Address = "Porbandar - India",
                     Gender = "Male",
-                    BirthDay = new DateTime(1869, 10, 2)
+                    //BirthDay = new DateTime(1869, 10, 2)
                 },
                 new PersonDTO {
                     Id = 2,
@@ -122,7 +122,7 @@ namespace REST_WebAPI.Tests {
                     LastName = "Gandhi",
                     Address = "Allahabad - India",
                     Gender = "Female",
-                    BirthDay = new DateTime(1917, 11, 19)
+                    //BirthDay = new DateTime(1917, 11, 19)
                 },
             };
 
@@ -197,8 +197,9 @@ namespace REST_WebAPI.Tests {
                     LastName = "Gandhi",
                     Address = "Porbandar - India",
                     Gender = "Male",
-                    BirthDay = new DateTime(1869, 10, 2)
-                }, options => options.Excluding(dto => dto.BirthDay)
+                    //BirthDay = new DateTime(1869, 10, 2)
+                }
+                //options => options.Excluding(dto => dto.BirthDay)
             );
 
             dtoList[1].Should().BeEquivalentTo(
@@ -208,8 +209,9 @@ namespace REST_WebAPI.Tests {
                     LastName = "Gandhi",
                     Address = "Allahabad - India",
                     Gender = "Female",
-                    BirthDay = new DateTime(1917, 11, 19)
-                }, options => options.Excluding(dto => dto.BirthDay)
+                    //BirthDay = new DateTime(1917, 11, 19)
+                }
+                //options => options.Excluding(dto => dto.BirthDay)
             );
 
             dtoList[0].FirstName.Should().Be("Mahatma");

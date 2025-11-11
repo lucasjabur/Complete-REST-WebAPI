@@ -24,7 +24,7 @@ namespace REST_WebAPI.Controllers.V2 {
 
             _logger.LogInformation($"Creating new Person: '{person.FirstName}'.");
             var createdPerson = _personService.Create(person);
-            
+
             if (createdPerson == null) {
                 _logger.LogWarning($"Failed to create Person with name: '{person.FirstName}'!");
                 return NotFound();
