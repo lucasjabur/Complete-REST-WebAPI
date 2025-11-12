@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using REST_WebAPI.Data.DTO.V1;
+using REST_WebAPI.Hypermedia.Utils;
+using REST_WebAPI.Models;
 using REST_WebAPI.Services;
 
 namespace REST_WebAPI.Controllers.V1 {
@@ -25,6 +27,16 @@ namespace REST_WebAPI.Controllers.V1 {
             _logger.LogInformation("Fetching all books.");
 
             return Ok(_bookServices.FindAll());
+        }
+
+        [HttpGet("{sortDirection}/{pageSize}/{page}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(200, Type = typeof(PagedSearchDTO<BookDTO>))]
+        public IActionResult Get([FromQuery] string title, string sortDirection, int pageSize, int page) {
+
+            _logger.LogInformation($"Fetching books with paged search: {title}, {sortDirection}, {pageSize}, {page}");
+            return Ok(_bookServices.FindWithPagedSearch(title, sortDirection, pageSize, page));
         }
 
         [HttpGet("{id}")]

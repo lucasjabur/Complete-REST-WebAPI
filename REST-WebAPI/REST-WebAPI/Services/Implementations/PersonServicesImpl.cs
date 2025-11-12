@@ -2,6 +2,7 @@
 using REST_WebAPI.Models;
 using REST_WebAPI.Repositories;
 using REST_WebAPI.Data.DTO.V1;
+using REST_WebAPI.Hypermedia.Utils;
 
 namespace REST_WebAPI.Services.Implementations {
     public class PersonServicesImpl : IPersonServices {
@@ -37,6 +38,16 @@ namespace REST_WebAPI.Services.Implementations {
         public PersonDTO Disable(long id) {
             var entity = _repository.Disable(id);
             return entity.Adapt<PersonDTO>();
+        }
+
+        public List<PersonDTO> FindByName(string firstName, string lastName) {
+            return _repository.FindByName(firstName, lastName).Adapt<List<PersonDTO>>();
+        }
+
+        public PagedSearchDTO<PersonDTO> FindWithPagedSearch(string name, string sortDirection, int pageSize, int page) {
+            var result = _repository.FindWithPagedSearch(name, sortDirection, pageSize, page);
+
+            return result.Adapt<PagedSearchDTO<PersonDTO>>();
         }
     }
 }

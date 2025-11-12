@@ -10,5 +10,7 @@ namespace REST_WebAPI.Repositories {
         bool Exists(long id);
         T FindById(long id);
         List<T> FindAll();
+        List<T> FindWithPagedSearch(string query);
+        int GetCount(string query);
     }
 }

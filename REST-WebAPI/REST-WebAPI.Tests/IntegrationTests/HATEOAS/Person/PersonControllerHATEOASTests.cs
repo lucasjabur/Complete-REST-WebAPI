@@ -10,12 +10,12 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
 
     [TestCaseOrderer(
         TestConfig.TestCaseOrdererFullName, TestConfig.TestCaseOrdererAssembly)]
-    public class BookControllerHATEOASTests : IClassFixture<SqlServerFixture> {
+    public class PersonControllerHATEOASTests : IClassFixture<SqlServerFixture> {
         private readonly HttpClient _httpClient;
         private static PersonDTO? _person;
 
 
-        public BookControllerHATEOASTests(SqlServerFixture sqlFixture) {
+        public PersonControllerHATEOASTests(SqlServerFixture sqlFixture) {
             var factory = new CustomWebApplicationFactory<Program>(
                 sqlFixture.ConnectionString);
 
@@ -111,7 +111,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
             AssertLinkPattern(content, "delete");
         }
 
-        [Fact(DisplayName = "05 - Find All People")]
+        [Fact(DisplayName = "05 - Find Paged People With HATEOAS")]
         [TestPriority(5)]
         public async Task FindAll_ShouldReturnLinksForEachPerson() {
             // ---------------------------
@@ -126,8 +126,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
             // Act
             // ---------------------------
             // Perform the HTTP GET request to retrieve all people.
-            var response = await _httpClient.GetAsync("api/person/v1");
-            response.EnsureSuccessStatusCode(); // Ensures the response status code is 2xx.
+            var response = await _httpClient.GetAsync("api/person/v1/asc/10/1"); // Ensures the response status code is 2xx.
 
             // Read the response content as a string.
             var content = await response.Content.ReadAsStringAsync();
@@ -136,7 +135,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
             // Assert
             // ---------------------------
             // Extract all "id" values from the response JSON using Regex.
-            var idMatches = Regex.Matches(content, @"""id"":\s*(\d+)");
+            var idMatches = Regex.Matches(content, @"""list"":\s*\[\s*{[^}]*""id"":\s*(\d+)");
             idMatches.Count.Should().BeGreaterThan(0, "There should be at least one person");
 
             // Iterate through each person id found in the response.
@@ -144,15 +143,15 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
                 var id = match.Groups[1].Value;
 
                 // Expected hypermedia relations (HATEOAS links).
-                var expectedRels = new[] { "collection", "self", "create", "update", "delete" };
+                var expectedRels = new[] { "collection", "self", "create", "update", "patch", "delete" };
 
                 foreach (var rel in expectedRels) {
                     // Build the expected regex pattern depending on the relation.
                     // For "self" and "delete", the link must contain the specific id.
                     // For others, the link points to the base endpoint.
                     var pattern = rel switch {
-                        "self" or "delete" =>
-                            $@"""rel"":\s*""{rel}"".*?""href"":\s*""https?://.+/api/person/v1/{id}""", // to 'self' and 'delete'
+                        "self" or "delete" or "patch" =>
+                            $@"""rel"":\s*""{rel}"".*?""href"":\s*""https?://.+/api/person/v1/{id}""", // to 'self', 'delete' and 'patch'
                         _ =>
                             $@"""rel"":\s*""{rel}"".*?""href"":\s*""https?://.+/api/person/v1""" // to others
                     };

@@ -1,15 +1,16 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using REST_WebAPI.Data.DTO.V1;
+using REST_WebAPI.Hypermedia.Utils;
 using REST_WebAPI.Models;
 using REST_WebAPI.Repositories;
 
 namespace REST_WebAPI.Services.Implementations {
     public class BookServicesImpl : IBookServices {
 
-        private readonly IRepository<Book> _repository;
+        private IBookRepository _repository;
 
-        public BookServicesImpl(IRepository<Book> repository) {
+        public BookServicesImpl(IBookRepository repository) {
             _repository = repository;
         }
 
@@ -37,5 +38,10 @@ namespace REST_WebAPI.Services.Implementations {
             return _repository.FindAll().Adapt<List<BookDTO>>();
         }
 
+        public PagedSearchDTO<BookDTO> FindWithPagedSearch(string title, string sortDirection, int pageSize, int page) {
+            var result = _repository.FindWithPagedSearch(title, sortDirection, pageSize, page);
+
+            return result.Adapt<PagedSearchDTO<BookDTO>>();
+        }
     }
 }

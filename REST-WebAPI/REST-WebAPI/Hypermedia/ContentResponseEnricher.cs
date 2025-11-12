@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.IdentityModel.Tokens;
 using REST_WebAPI.Hypermedia.Abstract;
+using REST_WebAPI.Hypermedia.Utils;
 
 namespace REST_WebAPI.Hypermedia {
     public abstract class ContentResponseEnricher<T> : IResponseEnricher where T : ISupportsHypermedia {
         public virtual bool CanEnrich(Type contentType) {
-            return contentType == typeof(T) || contentType == typeof(List<T>);
+            return contentType == typeof(T)
+                || contentType == typeof(List<T>)
+                || contentType == (typeof(PagedSearchDTO<T>));
         }
 
         protected abstract Task EnrichModel(T content, IUrlHelper urlHelper);
@@ -26,6 +29,11 @@ namespace REST_WebAPI.Hypermedia {
                     await EnrichModel(model, urlHelper);
                 } else if (okObjectResult.Value is List<T> collection) {
                     foreach (var element in collection) {
+                        await EnrichModel(element, urlHelper);
+                    }
+                } else if (okObjectResult.Value is PagedSearchDTO<T> pagedSearch) {
+                    foreach (var element in pagedSearch.List) {
+                        element.Links?.Clear();
                         await EnrichModel(element, urlHelper);
                     }
                 }

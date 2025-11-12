@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using REST_WebAPI.Services;
 using REST_WebAPI.Data.DTO.V1;
+using REST_WebAPI.Hypermedia.Utils;
 
 namespace REST_WebAPI.Controllers.V1 {
     [ApiController]
@@ -16,13 +17,23 @@ namespace REST_WebAPI.Controllers.V1 {
             _logger = logger;
         }
 
-        [HttpGet]
+        [HttpGet("{sortDirection}/{pageSize}/{page}")]
+        // [ProducesResponseType(200, Type = typeof(List<PersonDTO>))]
+        [ProducesResponseType(200, Type = typeof(PagedSearchDTO<PersonDTO>))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        public IActionResult Get([FromQuery] string name, string sortDirection, int pageSize, int page) {
+            _logger.LogInformation($"Fetching people with paged search: {name}, {sortDirection}, {pageSize}, {page}");
+            return Ok(_personService.FindWithPagedSearch(name, sortDirection, pageSize, page));
+        }
+
+        [HttpGet("find-by-name")]
         [ProducesResponseType(200, Type = typeof(List<PersonDTO>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        public IActionResult Get() {
-            _logger.LogInformation("Fetching all persons");
-            return Ok(_personService.FindAll());
+        public IActionResult GetByName([FromQuery] string firstName, [FromQuery] string lastName) {
+            _logger.LogInformation("Fetching persons by name: {firstName} {lastName}", firstName, lastName);
+            return Ok(_personService.FindByName(firstName, lastName));
         }
 
         [HttpGet("{id}")]

@@ -45,5 +45,21 @@ namespace REST_WebAPI.Repositories.Implementations {
         public bool Exists(long id) {
             return _dataset.Any(e => e.Id == id);
         }
+
+        public List<T> FindWithPagedSearch(string query) {
+            // return _dataset.FromSqlRaw(query).ToList();
+            return [.. _dataset.FromSqlRaw(query)];
+        }
+
+        public int GetCount(string query) {
+            using var connection = _context.Database.GetDbConnection();
+            connection.Open();
+
+            using var command = connection.CreateCommand();
+            command.CommandText = query;
+
+            var result = command.ExecuteScalar();
+            return Convert.ToInt32(result);
+        }
     }
 }

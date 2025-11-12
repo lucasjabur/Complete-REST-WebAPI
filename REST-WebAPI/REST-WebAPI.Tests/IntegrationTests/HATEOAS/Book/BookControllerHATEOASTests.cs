@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using REST_WebAPI.Data.DTO.V1;
+using REST_WebAPI.Models;
 using REST_WebAPI.Tests.IntegrationTests.Tools;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
@@ -38,7 +40,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
                 Title = "Harry Potter and The Sorcerer's Stone",
                 Author = "J. K. Rowling",
                 Price = 29.90m,
-                LaunchDate = DateTime.Now
+                LaunchDate = new DateTime(2025 - 04 - 25)
             };
 
             var response = await _httpClient.PostAsJsonAsync(
@@ -78,6 +80,30 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
         [Fact(DisplayName = "03 - Get Book By ID")]
         [TestPriority(3)]
         public async Task GetBookById_ShouldContainHATEOASLinks() {
+            var needsCreate = false;
+            if (_book == null) {
+                needsCreate = true;
+            }
+            else {
+                var getResponse = await _httpClient.GetAsync($"api/person/v1/{_book!.Id}");
+                if (getResponse.StatusCode == HttpStatusCode.NotFound) needsCreate = true;
+            }
+            if (needsCreate) {
+                var request = new BookDTO {
+                    Title = "Harry Potter and The Sorcerer's Stone",
+                    Author = "J. K. Rowling",
+                    Price = 29.90m,
+                    LaunchDate = new DateTime(2025-04-25)
+                };
+
+                var createResponse = await _httpClient.PostAsJsonAsync(
+                    "/api/book/v1", request);
+
+                createResponse.EnsureSuccessStatusCode();
+                var created = await createResponse.Content.ReadAsStringAsync();
+                _book = await createResponse.Content.ReadFromJsonAsync<BookDTO>();
+            }
+            
             var response = await _httpClient.GetAsync($"/api/book/v1/{_book!.Id}");
 
             response.EnsureSuccessStatusCode();
@@ -92,8 +118,40 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
             AssertLinkPattern(content, "delete");
         }
 
-        [Fact(DisplayName = "04 - Find All People")]
+        [Fact(DisplayName = "04 - Delete Book")]
         [TestPriority(4)]
+        public async Task DeleteBook_ShouldReturnNoContent() {
+            var needsCreate = false;
+            if (_book == null) {
+                needsCreate = true;
+            }
+            else {
+                var getResponse = await _httpClient.GetAsync($"api/person/v1/{_book!.Id}");
+                if (getResponse.StatusCode == HttpStatusCode.NotFound) needsCreate = true;
+            }
+            if (needsCreate) {
+                var request = new BookDTO {
+                    Title = "Harry Potter and The Sorcerer's Stone",
+                    Author = "J. K. Rowling",
+                    Price = 29.90m,
+                    LaunchDate = new DateTime(2025 - 04 - 25)
+                };
+
+                var createResponse = await _httpClient.PostAsJsonAsync(
+                    "/api/book/v1", request);
+
+                createResponse.EnsureSuccessStatusCode();
+                var created = await createResponse.Content.ReadAsStringAsync();
+                _book = await createResponse.Content.ReadFromJsonAsync<BookDTO>();
+            }
+            var response = await _httpClient.DeleteAsync($"/api/book/v1/{_book!.Id}");
+
+            response.EnsureSuccessStatusCode();
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
+        [Fact(DisplayName = "05 - Find All Books")]
+        [TestPriority(5)]
         public async Task FindAll_ShouldReturnLinksForEachBook() {
             // ---------------------------
             // Arrange
