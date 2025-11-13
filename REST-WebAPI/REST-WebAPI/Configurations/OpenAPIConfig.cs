@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 
 namespace REST_WebAPI.Configurations {
     public static class OpenAPIConfig {

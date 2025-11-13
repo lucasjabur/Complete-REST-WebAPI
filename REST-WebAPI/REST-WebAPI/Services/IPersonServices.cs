@@ -1,4 +1,5 @@
-﻿using REST_WebAPI.Data.DTO.V1;
+﻿using Microsoft.AspNetCore.Mvc;
+using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Hypermedia.Utils;
 
 namespace REST_WebAPI.Services {
@@ -11,5 +12,7 @@ namespace REST_WebAPI.Services {
         PersonDTO Disable(long id);
         List<PersonDTO> FindByName(string firstName, string lastName);
         PagedSearchDTO<PersonDTO> FindWithPagedSearch(string name, string sortDirection, int pageSize, int page);
+        Task<List<PersonDTO>> MassCreationFileAsync(IFormFile file);
+        FileContentResult ExportPage(int page, int pageSize, string sortDirection, string acceptHeader, string name);
     }
 }
