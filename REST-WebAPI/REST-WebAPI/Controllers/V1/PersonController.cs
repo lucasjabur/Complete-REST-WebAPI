@@ -137,8 +137,9 @@ namespace REST_WebAPI.Controllers.V1 {
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(415)]
-        [ProducesResponseType(200, Type = typeof(FileContentResult))]
-        [Produces(MediaTypes.ApplicationCsv, MediaTypes.ApplicationXlsx)]
+        // [ProducesResponseType(200, Type = typeof(FileContentResult))]
+        // [Produces(MediaTypes.ApplicationCsv, MediaTypes.ApplicationXlsx)]
+        [ProducesResponseType(typeof(byte[]), 200, MediaTypes.ApplicationCsv, MediaTypes.ApplicationXlsx)]
         public IActionResult ExportFile(string sortDirection, int pageSize, int page, [FromQuery] string name = "") {
             var acceptHeader = Request.Headers["Accept"].ToString();
             if (string.IsNullOrWhiteSpace(acceptHeader)) {

@@ -4,6 +4,7 @@ using REST_WebAPI.Files.Exporters.Implementations;
 using REST_WebAPI.Files.Importers.Factory;
 using REST_WebAPI.Files.Importers.Implementations;
 using REST_WebAPI.Hypermedia.Filters;
+using REST_WebAPI.Mail;
 using REST_WebAPI.Repositories;
 using REST_WebAPI.Repositories.Implementations;
 using REST_WebAPI.Services;
@@ -26,6 +27,7 @@ builder.Services.AddRouteConfig();
 
 builder.Services.AddCorsConfiguration(builder.Configuration);
 builder.Services.AddHATEOASConfiguration();
+builder.Services.AddEmailConfiguration(builder.Configuration);
 builder.Services.AddDatabaseConfiguration(builder.Configuration);
 builder.Services.AddEvolveConfiguration(builder.Configuration, builder.Environment);
 
@@ -36,6 +38,9 @@ builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookServices, BookServicesImpl>();
 
 builder.Services.AddScoped<PersonServicesImplV2>();
+
+builder.Services.AddScoped<IEmailServices, EmailServicesImpl>();
+builder.Services.AddScoped<EmailSender>();
 
 builder.Services.AddScoped<CsvImporter>();
 builder.Services.AddScoped<XlsxImporter>();
