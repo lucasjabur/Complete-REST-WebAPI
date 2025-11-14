@@ -1,12 +1,15 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using REST_WebAPI.Services;
-using REST_WebAPI.Data.DTO.V1;
-using REST_WebAPI.Hypermedia.Utils;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Files.Importers.Factory;
+using REST_WebAPI.Hypermedia.Utils;
+using REST_WebAPI.Services;
 
 namespace REST_WebAPI.Controllers.V1 {
+
     [ApiController]
+    [Authorize("Bearer")]
     [Route("api/[controller]/v1")]
     // [EnableCors("LocalPolicy")]
     public class PersonController : ControllerBase {

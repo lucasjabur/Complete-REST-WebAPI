@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Services;
 using System.Text.Json;
@@ -6,6 +7,7 @@ using System.Text.Json;
 namespace REST_WebAPI.Controllers.V1 {
     
     [ApiController]
+    [Authorize("Bearer")]
     [Route("api/[controller]/v1")]
     public class EmailController : ControllerBase {
         

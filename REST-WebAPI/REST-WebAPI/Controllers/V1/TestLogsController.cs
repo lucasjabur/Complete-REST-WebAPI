@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace REST_WebAPI.Controllers.V1 {
 
     [ApiController]
+    [Authorize("Bearer")]
     [Route("api/[controller]/v1")]
     public class TestLogsController : ControllerBase {
 

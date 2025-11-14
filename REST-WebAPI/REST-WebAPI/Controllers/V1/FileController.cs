@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Services;
@@ -6,6 +7,7 @@ using REST_WebAPI.Services;
 namespace REST_WebAPI.Controllers.V1 {
 
     [ApiController]
+    [Authorize("Bearer")]
     [Route("api/[controller]/v1")]
     public class FileController : ControllerBase {
 

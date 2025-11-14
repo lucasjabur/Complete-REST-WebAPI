@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Hypermedia.Utils;
 using REST_WebAPI.Models;
@@ -7,6 +8,7 @@ using REST_WebAPI.Services;
 namespace REST_WebAPI.Controllers.V1 {
 
     [ApiController]
+    [Authorize("Bearer")]
     [Route("api/[controller]/v1")]
     public class BookController : ControllerBase {
 

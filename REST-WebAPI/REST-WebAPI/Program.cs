@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Identity;
+using REST_WebAPI.Auth.Contract;
+using REST_WebAPI.Auth.Tools;
 using REST_WebAPI.Configurations;
 using REST_WebAPI.Files.Exporters.Factory;
 using REST_WebAPI.Files.Exporters.Implementations;
@@ -30,12 +33,15 @@ builder.Services.AddHATEOASConfiguration();
 builder.Services.AddEmailConfiguration(builder.Configuration);
 builder.Services.AddDatabaseConfiguration(builder.Configuration);
 builder.Services.AddEvolveConfiguration(builder.Configuration, builder.Environment);
+builder.Services.AddAuthConfiguration(builder.Configuration);
 
-builder.Services.AddScoped<IPersonServices, PersonServicesImpl>();
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
+builder.Services.AddScoped<IPersonServices, PersonServicesImpl>();
 
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookServices, BookServicesImpl>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<PersonServicesImplV2>();
 
@@ -51,6 +57,11 @@ builder.Services.AddScoped<FileExporterFactory>();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IFileServices, FileServicesImpl>();
+builder.Services.AddScoped<IPasswordHasher, Sha256PasswordHasher>();
+
+builder.Services.AddScoped<IUserAuthServices, UserAuthServicesImpl>();
+builder.Services.AddScoped<ILoginServices, LoginServicesImpl>();
+builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 
@@ -61,8 +72,9 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseCorsConfiguration(builder.Configuration);
 
 app.MapControllers();
