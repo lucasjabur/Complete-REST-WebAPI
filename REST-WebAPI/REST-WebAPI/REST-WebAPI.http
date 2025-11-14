@@ -1,4 +1,4 @@
-@REST_WebAPI_HostAddress = http://localhost:5063
+@REST_WebAPI_HostAddress = http://localhost:8080
 
 GET {{REST_WebAPI_HostAddress}}/swagger-ui/index.html
 Accept: text/html

@@ -1,0 +1,22 @@
+services:
+  rest-web-api:
+    image: lucasjabur/rest-web-api:latest
+    build:
+      context: .
+      dockerfile: REST-WebAPI/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+        - ConnectionStrings__MSSQLServerSQLConnectionString=Data Source=host.docker.internal\SQLEXPRESS;Initial Catalog=ASP.NET10;User Id=lucasjabur;Password=19032002;TrustServerCertificate=true;
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    networks:
+      - jabur-network
+networks:
+  jabur-network:
+    driver: bridge

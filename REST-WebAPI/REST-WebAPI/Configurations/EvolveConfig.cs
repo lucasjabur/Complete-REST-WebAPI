@@ -33,7 +33,8 @@ namespace REST_WebAPI.Configurations {
             using var evolveConnection = new SqlConnection(connectionString);
             var evolve = new Evolve(
                 evolveConnection,
-                msg => Log.Information(msg)) {
+                msg => Log.Information(msg)
+            ) {
                 Locations = new List<string> { "db/migrations", "db/dataset" },
                 IsEraseDisabled = true
             };

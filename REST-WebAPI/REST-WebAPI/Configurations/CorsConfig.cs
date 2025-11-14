@@ -25,8 +25,7 @@ namespace REST_WebAPI.Configurations {
                     policy => policy.WithOrigins(
                             "http://localhost:3000",
                             "http://localhost:8080",
-                            "http://localhost:5063",
-                            "https://localhost:7161",
+                            "https://localhost:8443",
                             "https://erudio.com.br"
                             )
                         .AllowAnyHeader()
