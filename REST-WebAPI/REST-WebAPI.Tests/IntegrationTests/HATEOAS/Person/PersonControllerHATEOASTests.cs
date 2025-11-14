@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Tests.IntegrationTests.Tools;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 
@@ -13,7 +14,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
     public class PersonControllerHATEOASTests : IClassFixture<SqlServerFixture> {
         private readonly HttpClient _httpClient;
         private static PersonDTO? _person;
-
+        private static TokenDTO? _token;
 
         public PersonControllerHATEOASTests(SqlServerFixture sqlFixture) {
             var factory = new CustomWebApplicationFactory<Program>(
@@ -31,9 +32,40 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
             Regex.IsMatch(content, pattern).Should().BeTrue($"Link with rel='{rel}' should exist and have valid href");
         }
 
+        [Fact(DisplayName = "00 - Sign In")]
+        [TestPriority(0)]
+        public async Task SignIn_ShouldReturnToken() {
+            // Arrange
+            var credentials = new UserDTO {
+                Username = "leandro",
+                Password = "admin123"
+            };
+
+            // Act
+            var response = await _httpClient
+                .PostAsJsonAsync("api/auth/sign-in", credentials);
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+
+            var token = await response.Content
+                .ReadFromJsonAsync<TokenDTO>();
+
+            token.Should().NotBeNull();
+
+            token.AccessToken.Should().NotBeNullOrWhiteSpace();
+            token.RefreshToken.Should().NotBeNullOrWhiteSpace();
+
+            _token = token;
+        }
+
         [Fact(DisplayName = "01 - Create Person")]
         [TestPriority(1)]
         public async Task CreatePerson_ShouldContainHATEOASLinks() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var request = new PersonDTO {
                 FirstName = "David",
                 LastName = "Heinemeier",
@@ -60,6 +92,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
         [TestPriority(2)]
 
         public async Task UpdatePerson_ShouldContainHATEOASLinks() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             _person!.LastName = "Heinemeier Hansson";
             var response = await _httpClient.PutAsJsonAsync(
                 "/api/person/v1", _person);
@@ -80,6 +116,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
         [TestPriority(3)]
 
         public async Task DisablePersonById_ShouldContainHATEOASLinks() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var response = await _httpClient.PatchAsync($"/api/person/v1/{_person!.Id}", null);
 
             response.EnsureSuccessStatusCode();
@@ -97,6 +137,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
         [Fact(DisplayName = "04 - Get Person By ID")]
         [TestPriority(4)]
         public async Task GetPersonById_ShouldContainHATEOASLinks() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var response = await _httpClient.GetAsync($"/api/person/v1/{_person!.Id}");
 
             response.EnsureSuccessStatusCode();
@@ -126,6 +170,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Person {
             // Act
             // ---------------------------
             // Perform the HTTP GET request to retrieve all people.
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var response = await _httpClient.GetAsync("api/person/v1/asc/10/1"); // Ensures the response status code is 2xx.
 
             // Read the response content as a string.

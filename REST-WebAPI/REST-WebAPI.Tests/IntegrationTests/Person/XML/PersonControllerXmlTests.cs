@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Newtonsoft.Json.Linq;
 using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Hypermedia.Utils;
 using REST_WebAPI.Tests.IntegrationTests.Tools;
@@ -15,6 +16,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.XML {
     public class PersonControllerXmlTests : IClassFixture<SqlServerFixture> {
         private readonly HttpClient _httpClient;
         private static PersonDTO? _person;
+        private static TokenDTO? _token;
 
         public PersonControllerXmlTests(SqlServerFixture sqlFixture) {
             var factory = new CustomWebApplicationFactory<Program>(
@@ -31,10 +33,44 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.XML {
                 .Add(new MediaTypeWithQualityHeaderValue("application/xml"));
         }
 
+        [Fact(DisplayName = "00 - Sign In")]
+        [TestPriority(0)]
+        public async Task SignIn_ShouldReturnToken() {
+            // Arrange
+            var credentials = new UserDTO {
+                Username = "leandro",
+                Password = "admin123"
+            };
+
+            var content = XmlHelper.SerializeToXml(credentials);
+
+            // Act
+            var response = await _httpClient
+                .PostAsync("api/auth/sign-in", content);
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+
+            var token = await XmlHelper
+                .ReadFromXmlAsync<TokenDTO>(response);
+
+            token.Should().NotBeNull();
+
+            token.AccessToken.Should().NotBeNullOrWhiteSpace();
+            token.RefreshToken.Should().NotBeNullOrWhiteSpace();
+
+            _token = token;
+        }
+
+
         [Fact(DisplayName = "01 - Create Person")]
         [TestPriority(1)]
         public async Task CreatePerson_ShouldReturnCreatedPerson() {
             // Arrange
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var request = new PersonDTO {
                 FirstName = "Galileo",
                 LastName = "Galilei",
@@ -65,6 +101,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.XML {
         [Fact(DisplayName = "02 - Update Person")]
         [TestPriority(2)]
         public async Task UpdatePerson_ShouldReturnUpdatedPerson() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var needsCreate = false;
             if (_person == null) {
                 needsCreate = true;
@@ -114,6 +154,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.XML {
         [Fact(DisplayName = "03 - Disable Person By ID")]
         [TestPriority(3)]
         public async Task DisablePersonById_ShouldReturnDisabledPerson() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var needsCreate = false;
             if (_person == null) {
                 needsCreate = true;
@@ -161,6 +205,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.XML {
         [Fact(DisplayName = "04 - Get Person By ID")]
         [TestPriority(4)]
         public async Task GetPersonById_ShouldReturnPerson() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var needsCreate = false;
             if (_person == null) {
                 needsCreate = true;
@@ -206,6 +254,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.XML {
         [Fact(DisplayName = "05 - Delete Person By ID")]
         [TestPriority(5)]
         public async Task DeletePersonById_ShouldReturnNoContent() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             if (_person == null) {
                 var request = new PersonDTO {
                     FirstName = "Galileo",
@@ -232,6 +284,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.XML {
         [Fact(DisplayName = "06 - Find all Person")]
         [TestPriority(6)]
         public async Task FindAllPerson_ShouldReturnListOfPerson() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             // Arrange & Act
             var response = await _httpClient
                 .GetAsync("api/person/v1/asc/10/1");
@@ -260,7 +316,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.XML {
             third.Address.Should().Be("PO Box 81864");
             third.Enabled.Should().BeFalse();
             third.Gender.Should().Be("Female");
-            
+
             page.CurrentPage.Should().BeGreaterThan(0);
             page.TotalResults.Should().BeGreaterThan(0);
             page.PageSize.Should().BeGreaterThan(0);

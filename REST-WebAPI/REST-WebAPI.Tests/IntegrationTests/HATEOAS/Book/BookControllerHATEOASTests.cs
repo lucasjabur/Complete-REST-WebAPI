@@ -1,10 +1,12 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Newtonsoft.Json.Linq;
 using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Models;
 using REST_WebAPI.Tests.IntegrationTests.Tools;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 
@@ -15,7 +17,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
     public class BookControllerHATEOASTests : IClassFixture<SqlServerFixture> {
         private readonly HttpClient _httpClient;
         private static BookDTO? _book;
-
+        private static TokenDTO? _token;
 
         public BookControllerHATEOASTests(SqlServerFixture sqlFixture) {
             var factory = new CustomWebApplicationFactory<Program>(
@@ -33,9 +35,40 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
             Regex.IsMatch(content, pattern).Should().BeTrue($"Link with rel='{rel}' should exist and have valid href");
         }
 
+        [Fact(DisplayName = "00 - Sign In")]
+        [TestPriority(0)]
+        public async Task SignIn_ShouldReturnToken() {
+            // Arrange
+            var credentials = new UserDTO {
+                Username = "leandro",
+                Password = "admin123"
+            };
+
+            // Act
+            var response = await _httpClient
+                .PostAsJsonAsync("api/auth/sign-in", credentials);
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+
+            var token = await response.Content
+                .ReadFromJsonAsync<TokenDTO>();
+
+            token.Should().NotBeNull();
+
+            token.AccessToken.Should().NotBeNullOrWhiteSpace();
+            token.RefreshToken.Should().NotBeNullOrWhiteSpace();
+
+            _token = token;
+        }
+
         [Fact(DisplayName = "01 - Create Book")]
         [TestPriority(1)]
         public async Task CreateBook_ShouldContainHATEOASLinks() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var request = new BookDTO {
                 Title = "Harry Potter and The Sorcerer's Stone",
                 Author = "J. K. Rowling",
@@ -61,6 +94,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
         [TestPriority(2)]
 
         public async Task UpdateBook_ShouldContainHATEOASLinks() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             _book!.Price = 48.80m;
             var response = await _httpClient.PutAsJsonAsync(
                 "/api/book/v1", _book);
@@ -80,6 +117,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
         [Fact(DisplayName = "03 - Get Book By ID")]
         [TestPriority(3)]
         public async Task GetBookById_ShouldContainHATEOASLinks() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var needsCreate = false;
             if (_book == null) {
                 needsCreate = true;
@@ -93,7 +134,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
                     Title = "Harry Potter and The Sorcerer's Stone",
                     Author = "J. K. Rowling",
                     Price = 29.90m,
-                    LaunchDate = new DateTime(2025-04-25)
+                    LaunchDate = new DateTime(2025 - 04 - 25)
                 };
 
                 var createResponse = await _httpClient.PostAsJsonAsync(
@@ -103,7 +144,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
                 var created = await createResponse.Content.ReadAsStringAsync();
                 _book = await createResponse.Content.ReadFromJsonAsync<BookDTO>();
             }
-            
+
             var response = await _httpClient.GetAsync($"/api/book/v1/{_book!.Id}");
 
             response.EnsureSuccessStatusCode();
@@ -121,6 +162,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
         [Fact(DisplayName = "04 - Delete Book")]
         [TestPriority(4)]
         public async Task DeleteBook_ShouldReturnNoContent() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var needsCreate = false;
             if (_book == null) {
                 needsCreate = true;
@@ -165,6 +210,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.HATEOAS.Book {
             // Act
             // ---------------------------
             // Perform the HTTP GET request to retrieve all people.
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var response = await _httpClient.GetAsync("api/book/v1");
             response.EnsureSuccessStatusCode(); // Ensures the response status code is 2xx.
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Tests.IntegrationTests.Tools;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace REST_WebAPI.Tests.IntegrationTests.CORS {
@@ -11,6 +12,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.CORS {
     public class PersonCorsIntegrationTests : IClassFixture<SqlServerFixture> {
         private readonly HttpClient _httpClient;
         private static PersonDTO? _person;
+        private static TokenDTO? _token;
 
         public PersonCorsIntegrationTests(SqlServerFixture sqlFixture) {
             var factory = new CustomWebApplicationFactory<Program>(
@@ -28,10 +30,41 @@ namespace REST_WebAPI.Tests.IntegrationTests.CORS {
             _httpClient.DefaultRequestHeaders.Add("Origin", origin);
         }
 
+        [Fact(DisplayName = "00 - Sign In")]
+        [TestPriority(0)]
+        public async Task SignIn_ShouldReturnToken() {
+            // Arrange
+            var credentials = new UserDTO {
+                Username = "leandro",
+                Password = "admin123"
+            };
+
+            // Act
+            var response = await _httpClient
+                .PostAsJsonAsync("api/auth/sign-in", credentials);
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+
+            var token = await response.Content
+                .ReadFromJsonAsync<TokenDTO>();
+
+            token.Should().NotBeNull();
+
+            token.AccessToken.Should().NotBeNullOrWhiteSpace();
+            token.RefreshToken.Should().NotBeNullOrWhiteSpace();
+
+            _token = token;
+        }
+
         [Fact(DisplayName = "01 - Create Person With Allowed Origin")]
         [TestPriority(1)]
         public async Task CreatePerson_WithAllowedOrigin_ShouldReturnCreated() {
             // Arrange
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             AddOriginHeader("https://erudio.com.br");
 
             var request = new PersonDTO {
@@ -60,6 +93,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.CORS {
         [TestPriority(2)]
         public async Task CreatePerson_WithDisallowedOrigin_ShouldReturnForbiden() {
             // Arrange
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             AddOriginHeader("https://semeru.com.br");
 
             var request = new PersonDTO {
@@ -85,6 +122,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.CORS {
         [TestPriority(3)]
         public async Task FindPersonById_WithAllowedOrigin_ShouldReturnOk() {
             // Arrange
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             AddOriginHeader("https://erudio.com.br");
 
             if (_person == null) {
@@ -123,6 +164,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.CORS {
         [TestPriority(4)]
         public async Task FindByIdPerson_WithDisallowedOrigin_ShouldReturnForbiden() {
             // Arrange
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             if (_person == null) {
                 AddOriginHeader("https://erudio.com.br");
 

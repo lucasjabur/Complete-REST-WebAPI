@@ -4,6 +4,7 @@ using REST_WebAPI.Data.DTO.V1;
 using REST_WebAPI.Hypermedia.Utils;
 using REST_WebAPI.Tests.IntegrationTests.Tools;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace REST_WebAPI.Tests.IntegrationTests.Person.JSON {
@@ -12,6 +13,7 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.JSON {
     public class PersonControllerJsonTests : IClassFixture<SqlServerFixture> {
         private readonly HttpClient _httpClient;
         private static PersonDTO? _person;
+        private static TokenDTO? _token;
 
         public PersonControllerJsonTests(SqlServerFixture sqlFixture) {
             var factory = new CustomWebApplicationFactory<Program>(
@@ -24,10 +26,41 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.JSON {
             );
         }
 
+        [Fact(DisplayName = "00 - Sign In")]
+        [TestPriority(0)]
+        public async Task SignIn_ShouldReturnToken() {
+            // Arrange
+            var credentials = new UserDTO {
+                Username = "leandro",
+                Password = "admin123"
+            };
+
+            // Act
+            var response = await _httpClient
+                .PostAsJsonAsync("api/auth/sign-in", credentials);
+
+            // Assert
+            response.EnsureSuccessStatusCode();
+
+            var token = await response.Content
+                .ReadFromJsonAsync<TokenDTO>();
+
+            token.Should().NotBeNull();
+
+            token.AccessToken.Should().NotBeNullOrWhiteSpace();
+            token.RefreshToken.Should().NotBeNullOrWhiteSpace();
+
+            _token = token;
+        }
+
         [Fact(DisplayName = "01 - Create Person")]
         [TestPriority(1)]
         public async Task CreatePerson_ShouldReturnCreatedPerson() {
             // Arrange
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var request = new PersonDTO {
                 FirstName = "Linus",
                 LastName = "Torvalds",
@@ -59,6 +92,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.JSON {
         [Fact(DisplayName = "02 - Update Person")]
         [TestPriority(2)]
         public async Task UpdatePerson_ShouldReturnUpdatedPerson() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var needsCreate = false;
             if (_person == null) {
                 needsCreate = true;
@@ -110,6 +147,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.JSON {
         [Fact(DisplayName = "03 - Disable Person By ID")]
         [TestPriority(3)]
         public async Task DisablePersonById_ShouldReturnDisabledPerson() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             if (_person == null) {
                 var request = new PersonDTO {
                     FirstName = "Linus",
@@ -149,6 +190,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.JSON {
         [Fact(DisplayName = "04 - Get Person By ID")]
         [TestPriority(4)]
         public async Task GetPersonById_ShouldReturnPerson() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             var needsCreate = false;
             if (_person == null) {
                 needsCreate = true;
@@ -195,6 +240,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.JSON {
         [Fact(DisplayName = "05 - Delete Person By ID")]
         [TestPriority(5)]
         public async Task DeletePersonById_ShouldReturnNoContent() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             if (_person == null) {
                 var request = new PersonDTO {
                     FirstName = "Linus",
@@ -221,6 +270,10 @@ namespace REST_WebAPI.Tests.IntegrationTests.Person.JSON {
         [Fact(DisplayName = "06 - Find all Person")]
         [TestPriority(6)]
         public async Task FindAllPerson_ShouldReturnListOfPerson() {
+
+            _httpClient.DefaultRequestHeaders.Authorization
+                = new AuthenticationHeaderValue("Bearer", _token?.AccessToken);
+
             // Arrange & Act
             var response = await _httpClient
                 .GetAsync("api/person/v1/asc/10/1");
